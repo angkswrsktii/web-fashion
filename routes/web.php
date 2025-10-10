@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PosController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchasingController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SalesController;
 
@@ -16,10 +19,15 @@ use App\Http\Controllers\SalesController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
+
+// frontend
+Route::get('/', [DashboardController::class, 'index']);
+Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+Route::get('/purchasing', [PurchasingController::class, 'index'])->name('purchasing.index');
+Route::get('/purchasing/create', [PurchasingController::class, 'index'])->name('purchasing.create');
+
+// backend
 Route::resource('products', ProductController::class);
 Route::resource('suppliers', SupplierController::class);
 Route::resource('sales', SalesController::class);
