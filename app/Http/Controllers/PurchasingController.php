@@ -13,4 +13,7 @@ class PurchasingController extends BaseController
     public function index() {
         return view("purchasing.index");
     }
+    public function create() {
+        return view("purchasing.create");
+    }
 }

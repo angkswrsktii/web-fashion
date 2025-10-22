@@ -7,7 +7,7 @@
         <h1 class="h2">Dashboard</h1>
     </div>
 
-    {{-- Cards Statistik --}}
+    {{-- Cards Statistik (KPIs) --}}
     <div class="row">
         <div class="col-md-3 mb-3">
             <div class="card text-white bg-primary">
@@ -43,49 +43,60 @@
         </div>
     </div>
 
-    {{-- Tabel Pesanan Terbaru --}}
-    <h2 class="mt-4">Recent Orders</h2>
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            <thead>
-                <tr>
-                    <th scope="col">Order ID</th>
-                    <th scope="col">Customer</th>
-                    <th scope="col">Product</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#1025</td>
-                    <td>Budi Santoso</td>
-                    <td>T-Shirt Black</td>
-                    <td>Rp 150.000</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>#1026</td>
-                    <td>Citra Lestari</td>
-                    <td>Jeans Blue</td>
-                    <td>Rp 450.000</td>
-                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                </tr>
-                <tr>
-                    <td>#1027</td>
-                    <td>Andi Wijaya</td>
-                    <td>Sneakers White</td>
-                    <td>Rp 750.000</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                </tr>
-                <tr>
-                    <td>#1028</td>
-                    <td>Dewi Anggraini</td>
-                    <td>Hoodie Gray</td>
-                    <td>Rp 350.000</td>
-                    <td><span class="badge bg-danger">Cancelled</span></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="row">
+        {{-- Tabel Pesanan Terbaru --}}
+        <div class="col-md-8">
+            <h2 class="mt-4">Recent Orders</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#1025</td>
+                            <td>Budi Santoso</td>
+                            <td>T-Shirt Black</td>
+                            <td>Rp 150.000</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>#1026</td>
+                            <td>Citra Lestari</td>
+                            <td>Jeans Blue</td>
+                            <td>Rp 450.000</td>
+                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#1027</td>
+                            <td>Andi Wijaya</td>
+                            <td>Sneakers White</td>
+                            <td>Rp 750.000</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Bagian Gambar Fashion --}}
+        <div class="col-md-4">
+             <h2 class="mt-4">New Arrivals</h2>
+             <div class="card">
+                {{-- Gunakan layanan placeholder untuk gambar fashion acak --}}
+                <img src="https://source.unsplash.com/random/400x300?fashion,style" class="card-img-top" alt="Random Fashion">
+                <div class="card-body">
+                    <h5 class="card-title">Autumn Collection</h5>
+                    <p class="card-text">Check out the latest trends for the new season.</p>
+                    <a href="#" class="btn btn-primary btn-sm">View Products</a>
+                </div>
+             </div>
+        </div>
     </div>
 @endsection

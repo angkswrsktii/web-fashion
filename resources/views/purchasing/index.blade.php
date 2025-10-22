@@ -35,7 +35,7 @@
                         <td>2025-10-08</td>
                         <td>Rp 15.000.000</td>
                         <td><span class="badge bg-success">Completed</span></td>
-                        <td><a href="#" class="btn btn-sm btn-outline-secondary">View Details</a></td>
+                        <td><a href="{{ route('purchasing.show') }}" class="btn btn-sm btn-outline-secondary">View Details</a></td>
                     </tr>
                     <tr>
                         <td>PO-2025-002</td>
@@ -43,7 +43,7 @@
                         <td>2025-10-09</td>
                         <td>Rp 22.500.000</td>
                         <td><span class="badge bg-primary">Submitted</span></td>
-                        <td><a href="#" class="btn btn-sm btn-outline-secondary">View Details</a></td>
+                        <td><a href="{{ route('purchasing.show') }}" class="btn btn-sm btn-outline-secondary">View Details</a></td>
                     </tr>
                     <tr>
                         <td>PO-2025-003</td>
@@ -51,7 +51,7 @@
                         <td>2025-10-10</td>
                         <td>Rp 7.800.000</td>
                         <td><span class="badge bg-warning text-dark">Draft</span></td>
-                        <td><a href="#" class="btn btn-sm btn-outline-secondary">View Details</a></td>
+                        <td><a href="{{ route('purchasing.show') }}" class="btn btn-sm btn-outline-secondary">View Details</a></td>
                     </tr>
                 </tbody>
             </table>
