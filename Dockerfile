@@ -1,31 +1,27 @@
-# Gunakan base image PHP dengan Apache
+# Gunakan image PHP + Apache
 FROM php:8.2-apache
 
-# Install ekstensi dan dependency
-RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libonig-dev libxml2-dev zip curl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Install ekstensi Laravel yang dibutuhkan
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Enable Apache mod_rewrite
+# Salin semua file ke dalam container
+COPY . /var/www/html
+
+# Ubah DocumentRoot Apache ke folder public
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+
+# Aktifkan mod_rewrite untuk Laravel
 RUN a2enmod rewrite
 
-# Set working directory
-WORKDIR /var/www/html
+# Ubah konfigurasi agar .htaccess Laravel berfungsi
+RUN echo '<Directory /var/www/html/public>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' > /etc/apache2/conf-available/laravel.conf \
+    && a2enconf laravel
 
-# Copy file Laravel ke dalam container
-COPY . .
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install dependencies Laravel
-RUN composer install --no-dev --optimize-autoloader
-
-# Set permission storage
+# Ganti permission agar Laravel bisa nulis di storage
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port 80
-EXPOSE 80
 
 # Jalankan Apache
 CMD ["apache2-foreground"]
