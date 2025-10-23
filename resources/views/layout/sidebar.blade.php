@@ -22,12 +22,12 @@
                     POS
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link {{ Request::is('purchasing*') ? 'active' : '' }}" href="{{ route('purchasing.index') }}">
                     <i class="bi bi-truck"></i>
                     Purchasing
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a class="nav-link {{ Request::is('inventory*') ? 'active' : '' }}" href="{{ route('inventory.index') }}">
                     <i class="bi bi-boxes"></i>

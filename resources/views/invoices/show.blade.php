@@ -81,7 +81,19 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td>Baju (32)</td>
+                        <td class="text-end">1</td>
+                        <td class="text-end">Rp 450.000</td>
+                        <td class="text-end">Rp 450.000</td>
+                    </tr>
+                    <tr>
                         <td>Jeans Blue (32)</td>
+                        <td class="text-end">1</td>
+                        <td class="text-end">Rp 450.000</td>
+                        <td class="text-end">Rp 450.000</td>
+                    </tr>
+                    <tr>
+                        <td>Celana (32)</td>
                         <td class="text-end">1</td>
                         <td class="text-end">Rp 450.000</td>
                         <td class="text-end">Rp 450.000</td>
@@ -99,16 +111,16 @@
             <div class="col-6">
                 <div class="d-flex justify-content-between">
                     <span class="fw-bold">Subtotal:</span>
-                    <span>Rp 450.000</span>
+                    <span>Rp 1.350.000</span>
                 </div>
                 <div class="d-flex justify-content-between">
                     <span class="fw-bold">Tax (11%):</span>
-                    <span>Rp 49.500</span>
+                    <span>Rp 148.500</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between fs-4">
                     <span class="fw-bold">TOTAL:</span>
-                    <span class="fw-bold">Rp 499.500</span>
+                    <span class="fw-bold">Rp 1201.500</span>
                 </div>
             </div>
         </div>

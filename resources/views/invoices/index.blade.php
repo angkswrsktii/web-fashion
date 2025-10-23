@@ -21,7 +21,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Invoice #</th>
-                        <th scope="col">Customer</th>
+                        <!-- <th scope="col">Customer</th> -->
                         <th scope="col">Date</th>
                         <th scope="col">Due Date</th>
                         <th scope="col">Total Amount</th>
@@ -33,7 +33,7 @@
                     {{-- Contoh Data 1: Paid --}}
                     <tr>
                         <td>INV-001</td>
-                        <td>Budi Santoso</td>
+                        <!-- <td>Budi Santoso</td> -->
                         <td>2025-10-05</td>
                         <td>2025-10-12</td>
                         <td>Rp 150.000</td>
@@ -45,7 +45,7 @@
                     {{-- Contoh Data 2: Pending --}}
                     <tr>
                         <td>INV-002</td>
-                        <td>Citra Lestari</td>
+                        <!-- <td>Citra Lestari</td> -->
                         <td>2025-10-08</td>
                         <td>2025-10-15</td>
                         <td>Rp 450.000</td>
@@ -57,7 +57,7 @@
                     {{-- Contoh Data 3: Overdue --}}
                     <tr>
                         <td>INV-003</td>
-                        <td>Andi Wijaya</td>
+                        <!-- <td>Andi Wijaya</td> -->
                         <td>2025-09-20</td>
                         <td>2025-09-27</td>
                         <td>Rp 750.000</td>
