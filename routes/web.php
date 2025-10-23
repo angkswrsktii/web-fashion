@@ -19,8 +19,6 @@ use App\Http\Controllers\SalesController;
 |
 */
 
-
-
 // frontend
 Route::get('/login', function () {
     return view('auth.login');
@@ -85,8 +83,3 @@ Route::get('/purchasing/show/1', function () {
 Route::get('/inventory/1/edit', function () {
     return view('inventory.edit');
 })->name('inventory.edit');
-
-// backend
-Route::resource('products', ProductController::class);
-Route::resource('suppliers', SupplierController::class);
-Route::resource('sales', SalesController::class);
