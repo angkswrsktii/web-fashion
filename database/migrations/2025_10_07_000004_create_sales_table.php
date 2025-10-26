@@ -10,7 +10,9 @@ return new class extends Migration {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->date('tanggal');
-            $table->decimal('total', 12, 2);
+            $table->decimal('subtotal', 12, 2)->default(0); // sebelum pajak
+            $table->decimal('tax', 5, 2)->default(11); // misal 11% pajak default
+            $table->decimal('total', 12, 2)->default(0); // setelah pajak
             $table->foreignId('kasir_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

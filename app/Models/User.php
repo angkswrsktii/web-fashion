@@ -12,7 +12,7 @@ class User extends Authenticatable
 {
     use HasFactory;
 
-    protected $fillable = ['username', 'password', 'role'];
+    protected $fillable = ['username', 'email', 'password', 'role'];
     public function sales()
     {
         return $this->hasMany(Sales::class, 'kasir_id');

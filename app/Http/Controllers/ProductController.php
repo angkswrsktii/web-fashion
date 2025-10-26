@@ -13,18 +13,26 @@ class ProductController extends Controller
         return response()->json(Product::with('supplier')->get());
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'stock' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
-            'supplier_id' => 'required|exists:suppliers,id',
-        ]);
+    public function store(Request $request){
+    $validated = $request->validate([
+        'kode_product' => 'required|string|max:50|unique:products',
+        'name' => 'required|string|max:255',
+        'category' => 'nullable|string|max:100',
+        'status' => 'nullable|in:active,inactive',
+        'deskripsi' => 'nullable|string',
+        'stock' => 'required|integer|min:0',
+        'price' => 'required|numeric|min:0',
+        'image' => 'nullable|string|max:255',
+        'supplier_id' => 'required|exists:suppliers,id',
+    ]);
 
-        $product = Product::create($validated);
+    $product = Product::create($validated);
 
-        return response()->json($product, 201);
+    return response()->json([
+        'status' => 201,
+        'message' => 'Product created successfully',
+        'data' => $product
+        ], 201);
     }
 
     public function show($id)
@@ -33,20 +41,28 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    public function update(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
+    public function update(Request $request, $id){
+    $product = Product::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'stock' => 'sometimes|integer|min:0',
-            'price' => 'sometimes|numeric|min:0',
-            'supplier_id' => 'sometimes|exists:suppliers,id',
+    $validated = $request->validate([
+        'kode_product' => 'sometimes|string|max:50|unique:products,kode_product,' . $id,
+        'name' => 'sometimes|string|max:255',
+        'category' => 'sometimes|string|max:100',
+        'status' => 'sometimes|in:active,inactive',
+        'deskripsi' => 'sometimes|string',
+        'stock' => 'sometimes|integer|min:0',
+        'price' => 'sometimes|numeric|min:0',
+        'image' => 'sometimes|string|max:255',
+        'supplier_id' => 'sometimes|exists:suppliers,id',
+    ]);
+
+    $product->update($validated);
+
+    return response()->json([
+        'status' => 200,
+        'message' => 'Product updated successfully',
+        'data' => $product
         ]);
-
-        $product->update($validated);
-
-        return response()->json($product);
     }
 
     public function destroy($id)
