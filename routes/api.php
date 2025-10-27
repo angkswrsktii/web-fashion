@@ -22,6 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// === ROUTES UNTUK LOGIN ===
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+
+// === ROUTES UNTUK REPORT ===
+Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index']);
+
 // === ROUTES UNTUK USER ===
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{id}', [UserController::class, 'show']);

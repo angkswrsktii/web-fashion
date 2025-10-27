@@ -10,43 +10,62 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Ambil semua user
-        return response()->json(User::all());
+        $users = User::all();
+        return response()->json([
+            'status' => 200,
+            'message' => 'OK',
+            'data' => $users
+        ]);
     }
 
     public function store(Request $request)
     {
-        // Validasi input
+    try {
         $validated = $request->validate([
             'username' => 'required|string|unique:users',
+            'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,kasir',
         ]);
 
-        // Simpan user baru (password di-hash)
-        $user = User::create([
+        User::create([
             'username' => $validated['username'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
         ]);
 
-        return response()->json($user, 201);
+        return response()->json([
+            'status' => 201,
+            'message' => 'User created successfully'
+        ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+                ], 422);
+        }
     }
 
     public function show($id)
     {
-        // Ambil 1 user berdasarkan ID
         $user = User::findOrFail($id);
-        return response()->json($user);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'OK',
+            'data' => $user
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        // Update data user
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'username' => 'sometimes|string|unique:users,username,' . $id . ',user_id',
+            'username' => 'sometimes|string|unique:users,username,' . $id,
+            'email' => 'sometimes|email|unique:users,email,' . $id,
             'password' => 'sometimes|string|min:6',
             'role' => 'sometimes|in:admin,kasir',
         ]);
@@ -57,15 +76,20 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return response()->json($user);
+        return response()->json([
+            'status' => 200,
+            'message' => 'User updated successfully'
+        ]);
     }
 
     public function destroy($id)
     {
-        // Hapus user
         $user = User::findOrFail($id);
         $user->delete();
 
-        return response()->json(['message' => 'User deleted successfully']);
+        return response()->json([
+            'status' => 200,
+            'message' => 'User deleted successfully'
+        ]);
     }
 }

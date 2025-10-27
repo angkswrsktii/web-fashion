@@ -9,17 +9,23 @@ class Sales extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tanggal', 'total', 'kasir_id'];
+    protected $fillable = ['tanggal', 'subtotal', 'tax', 'total', 'kasir_id'];
 
-    // Relasi ke kasir (user)
     public function kasir()
     {
         return $this->belongsTo(User::class, 'kasir_id');
     }
 
-    // Relasi ke detail penjualan
     public function details()
     {
-        return $this->hasMany(SalesDetail::class, 'sales_id');
+        return $this->hasMany(SalesDetail::class, 'sale_id');
+    }
+
+    // Fungsi helper: hitung total otomatis
+    public function hitungTotal()
+    {
+        $this->subtotal = $this->details->sum('subtotal');
+        $this->total = $this->subtotal + ($this->subtotal * ($this->tax / 100));
+        $this->save();
     }
 }
