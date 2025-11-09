@@ -16,6 +16,7 @@
         flex-grow: 1;
         overflow-y: auto;
         padding: 1.5rem;
+        position: relative; /* Diperlukan untuk alert placeholder */
     }
 
     .product-card {
@@ -63,6 +64,10 @@
 <div class="pos-container">
     {{-- KIRI: DAFTAR PRODUK --}}
     <div class="product-list">
+        
+        {{-- !!! PERUBAHAN 1: Tambahkan Placeholder Alert !!! --}}
+        <div id="alert-placeholder" class="position-sticky" style="top: 10px; z-index: 1050;"></div>
+
         {{-- Header & Search --}}
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h4">Products</h2>
@@ -74,51 +79,35 @@
         {{-- Filter Kategori --}}
         <div class="mb-4">
             <button class="btn btn-outline-secondary btn-sm">All</button>
-            <button class="btn btn-outline-secondary btn-sm">T-Shirts</button>
-            <button class="btn btn-outline-secondary btn-sm">Jeans</button>
-            <button class="btn btn-outline-secondary btn-sm">Hoodies</button>
-            <button class="btn btn-outline-secondary btn-sm">Sneakers</button>
+            {{-- Nanti Anda bisa buat ini dinamis --}}
         </div>
 
-        {{-- Grid Produk (Contoh Data) --}}
+        {{-- Grid Produk (DINAMIS DARI CONTROLLER) --}}
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4" id="product-grid">
-            <div class="col" onclick="addToCart('T-Shirt Black', 150000)">
-                <div class="card h-100 product-card">
-                    <img src="https://via.placeholder.com/150/000000/FFFFFF?text=Fashion" class="card-img-top" alt="T-Shirt Black">
-                    <div class="card-body p-2">
-                        <h6 class="card-title mb-1">T-Shirt Black</h6>
-                        <p class="card-text fw-bold">Rp 150.000</p>
+            
+            {{-- Loop data dari FrontPosController --}}
+            @forelse ($products as $product)
+                <div class="col product-card-clickable" 
+                     data-product-id="{{ $product->id }}" 
+                     data-product-name="{{ addslashes($product->name) }}" 
+                     data-product-price="{{ $product->price }}">
+                    
+                    <div class="card h-100 product-card">
+                        {{-- Ganti placeholder dengan gambar produk jika ada --}}
+                        <img src="{{ $product->image_url ?? 'https://via.placeholder.com/150/808080/FFFFFF?text=Fashion' }}" class="card-img-top" alt="{{ $product->name }}">
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1">{{ $product->name }}</h6>
+                            <p class="card-text fw-bold">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col" onclick="addToCart('Jeans Blue', 450000)">
-                <div class="card h-100 product-card">
-                    <img src="https://via.placeholder.com/150/0000FF/FFFFFF?text=Fashion" class="card-img-top" alt="Jeans Blue">
-                    <div class="card-body p-2">
-                        <h6 class="card-title mb-1">Jeans Blue</h6>
-                        <p class="card-text fw-bold">Rp 450.000</p>
-                    </div>
+            @empty
+                <div class="col-12">
+                    <p class="text-muted">No products found in the inventory.</p>
                 </div>
-            </div>
-             <div class="col" onclick="addToCart('Sneakers White', 750000)">
-                <div class="card h-100 product-card">
-                    <img src="https://via.placeholder.com/150/FFFFFF/000000?text=Fashion" class="card-img-top" alt="Sneakers White">
-                    <div class="card-body p-2">
-                        <h6 class="card-title mb-1">Sneakers White</h6>
-                        <p class="card-text fw-bold">Rp 750.000</p>
-                    </div>
-                </div>
-            </div>
-             <div class="col" onclick="addToCart('Hoodie Gray', 350000)">
-                <div class="card h-100 product-card">
-                    <img src="https://via.placeholder.com/150/808080/FFFFFF?text=Fashion" class="card-img-top" alt="Hoodie Gray">
-                    <div class="card-body p-2">
-                        <h6 class="card-title mb-1">Hoodie Gray</h6>
-                        <p class="card-text fw-bold">Rp 350.000</p>
-                    </div>
-                </div>
-            </div>
-            </div>
+            @endforelse
+            
+        </div>
     </div>
 
     {{-- KANAN: KERANJANG / TAGIHAN --}}
@@ -130,10 +119,7 @@
 
         {{-- Daftar Item di Keranjang --}}
         <div class="cart-items" id="cart-items">
-            <div class="text-center text-muted mt-4">
-                <p>Your cart is empty</p>
-                <i class="bi bi-cart-x" style="font-size: 4rem;"></i>
-            </div>
+            {{-- Tampilan keranjang kosong (default) --}}
         </div>
 
         {{-- Ringkasan dan Pembayaran --}}
@@ -151,7 +137,7 @@
                 <span id="cart-total">Rp 0</span>
             </div>
             <div class="d-grid gap-2 mt-3">
-                <button class="btn btn-primary btn-lg" onclick="processPayment()">Process Payment</button>
+                <button class="btn btn-primary btn-lg" id="payment-button" onclick="processPayment()">Process Payment</button>
             </div>
         </div>
     </div>
@@ -160,27 +146,47 @@
 
 @push('page-scripts')
 <script>
-    // Inisialisasi keranjang belanja
-    let cart = {};
-    const TAX_RATE = 0.11;
+    // --- DATA DARI CONTROLLER ---
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    // Fungsi untuk memformat angka menjadi Rupiah
+    // --- INISIALISASI ---
+    let cart = {}; 
+    const TAX_RATE = 0.11; // 11%
+
+    // --- FUNGSI UTAMA ---
+
+    // !!! PERUBAHAN 2: Fungsi baru untuk menampilkan Bootstrap Alert !!!
+    function showAlert(message, type = 'success') {
+        const alertPlaceholder = $('#alert-placeholder');
+        
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Hapus alert lama (jika ada) dan tambahkan yang baru
+        alertPlaceholder.empty().append(alertHtml);
+
+        // Auto-dismiss setelah 5 detik
+        setTimeout(() => {
+            alertPlaceholder.find('.alert').alert('close');
+        }, 5000);
+    }
+
     function formatRupiah(number) {
         return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
+            style: 'currency', currency: 'IDR', minimumFractionDigits: 0
         }).format(number);
     }
 
-    // Fungsi untuk menambahkan produk ke keranjang
-    function addToCart(productName, price) {
-        if (cart[productName]) {
-            // Jika produk sudah ada, tambah jumlahnya
-            cart[productName].quantity++;
+    function addToCart(productId, productName, price) {
+        if (cart[productId]) {
+            cart[productId].quantity++;
         } else {
-            // Jika produk baru, tambahkan ke keranjang
-            cart[productName] = {
+            cart[productId] = {
+                name: productName, 
                 price: price,
                 quantity: 1
             };
@@ -188,19 +194,16 @@
         updateCart();
     }
     
-    // Fungsi untuk mengubah jumlah produk
-    function changeQuantity(productName, amount) {
-        if (cart[productName]) {
-            cart[productName].quantity += amount;
-            if (cart[productName].quantity <= 0) {
-                // Hapus produk jika jumlahnya 0 atau kurang
-                delete cart[productName];
+    function changeQuantity(productId, amount) {
+        if (cart[productId]) {
+            cart[productId].quantity += amount;
+            if (cart[productId].quantity <= 0) {
+                delete cart[productId];
             }
         }
         updateCart();
     }
     
-    // Fungsi untuk menghapus semua isi keranjang
     function clearCart() {
         if(confirm('Are you sure you want to clear the cart?')) {
             cart = {};
@@ -208,14 +211,11 @@
         }
     }
 
-    // Fungsi utama untuk memperbarui tampilan keranjang
     function updateCart() {
         const cartItemsContainer = $('#cart-items');
         cartItemsContainer.empty();
-
         let subtotal = 0;
 
-        // Cek jika keranjang kosong
         if (Object.keys(cart).length === 0) {
             cartItemsContainer.html(`
                 <div class="text-center text-muted mt-4">
@@ -224,8 +224,8 @@
                 </div>
             `);
         } else {
-            for (const productName in cart) {
-                const item = cart[productName];
+            for (const productId in cart) {
+                const item = cart[productId];
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
 
@@ -234,13 +234,13 @@
                         <div class="card-body p-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="mb-0">${productName}</h6>
+                                    <h6 class="mb-0">${item.name}</h6>
                                     <small class="text-muted">${formatRupiah(item.price)}</small>
                                 </div>
                                 <div class="d-flex align-items-center quantity-controls">
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="changeQuantity('${productName}', -1)">-</button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="changeQuantity(${productId}, -1)">-</button>
                                     <input type="text" class="form-control form-control-sm mx-1" value="${item.quantity}" readonly>
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="changeQuantity('${productName}', 1)">+</button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="changeQuantity(${productId}, 1)">+</button>
                                 </div>
                                 <span class="fw-bold">${formatRupiah(itemTotal)}</span>
                             </div>
@@ -254,27 +254,69 @@
         const tax = subtotal * TAX_RATE;
         const total = subtotal + tax;
         
-        // Update ringkasan total
         $('#cart-subtotal').text(formatRupiah(subtotal));
         $('#cart-tax').text(formatRupiah(tax));
         $('#cart-total').text(formatRupiah(total));
     }
     
-    function processPayment() {
+    // --- PERUBAHAN 3: Ganti alert() dengan showAlert() ---
+    async function processPayment() {
+        const paymentButton = $('#payment-button');
+        
         if (Object.keys(cart).length === 0) {
-            alert('Cart is empty!');
+            showAlert('Cart is empty!', 'warning'); // <-- Ganti alert()
             return;
         }
-        const total = $('#cart-total').text();
-        alert(`Processing payment for ${total}.\n(Ini hanya demonstrasi)`);
-        // Di aplikasi nyata, di sini Anda akan memproses payment gateway, mencetak struk, dll.
-        cart = {}; // Kosongkan keranjang setelah pembayaran
-        updateCart();
+
+        const payload = {
+            cart: cart, 
+            tax_rate: TAX_RATE 
+        };
+
+        paymentButton.prop('disabled', true).text('Processing...');
+
+        try {
+            const response = await fetch("{{ route('pos.processPayment') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN, 
+                    'Accept': 'application/json' 
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) { 
+                showAlert(result.message, 'success'); // <-- Ganti alert()
+                cart = {}; 
+                updateCart();
+            } else {
+                // Tampilkan error validasi atau server error dari API
+                showAlert('Error: ' + (result.message || 'Failed to process payment.'), 'danger'); // <-- Ganti alert()
+                console.error(result);
+            }
+
+        } catch (error) {
+            console.error('Fetch Error:', error);
+            showAlert('An unexpected error occurred. Please check console.', 'danger'); // <-- Ganti alert()
+        } finally {
+            paymentButton.prop('disabled', false).text('Process Payment');
+        }
     }
 
-    // Panggil updateCart() saat halaman pertama kali dimuat
     $(document).ready(function() {
         updateCart();
+
+        $('#product-grid').on('click', '.product-card-clickable', function() {
+            const $card = $(this); 
+            const productId = $card.data('product-id');
+            const productName = $card.data('product-name');
+            const productPrice = $card.data('product-price');
+            addToCart(productId, productName, productPrice);
+        });
     });
 </script>
 @endpush
+
